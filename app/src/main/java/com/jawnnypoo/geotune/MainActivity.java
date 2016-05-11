@@ -39,6 +39,7 @@ import com.jawnnypoo.geotune.data.GeoTune;
 import com.jawnnypoo.geotune.dialog.ChooseUriDialog;
 import com.jawnnypoo.geotune.dialog.EditNameDialog;
 import com.jawnnypoo.geotune.loader.GeoTunesLoader;
+import com.jawnnypoo.geotune.observable.GetFileNameObservableFactory;
 import com.jawnnypoo.geotune.service.GeoTuneModService;
 import com.jawnnypoo.geotune.util.NotificationUtils;
 
@@ -47,6 +48,9 @@ import java.util.ArrayList;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
+import rx.schedulers.Schedulers;
 import timber.log.Timber;
 
 /**
@@ -218,17 +222,25 @@ public class MainActivity extends BaseActivity implements LoaderManager.LoaderCa
         }
     }
 
-    private void updateGeotuneUri(Uri uri) {
+    private void updateGeotuneUri(final Uri uri) {
         if (mActiveGeoTune != null) {
-            mActiveGeoTune.setTuneUri(uri);
-            mGeoTuneAdapter.onGeoTuneChanged(mActiveGeoTune);
-            NotificationUtils.playTune(this, mActiveGeoTune);
-            ContentValues cv = new ContentValues();
-            cv.put(GeoTune.KEY_TUNE, uri.toString());
-            GeoTuneModService.updateGeoTune(MainActivity.this, cv, mActiveGeoTune.getId());
-            //TODO
-            //new GetFileNameTask(MainActivity.this, mActiveGeoTune, this).execute(uri);
-            mActiveGeoTune = null;
+            GetFileNameObservableFactory.create(getApplicationContext(), uri)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new Action1<String>() {
+                        @Override
+                        public void call(String name) {
+                            mActiveGeoTune.setTuneUri(uri);
+                            mActiveGeoTune.setTuneName(name);
+                            mGeoTuneAdapter.onGeoTuneChanged(mActiveGeoTune);
+                            NotificationUtils.playTune(MainActivity.this, mActiveGeoTune);
+                            ContentValues cv = new ContentValues();
+                            cv.put(GeoTune.KEY_TUNE, uri.toString());
+                            cv.put(GeoTune.KEY_TUNE_NAME, name);
+                            GeoTuneModService.updateGeoTune(MainActivity.this, cv, mActiveGeoTune.getId());
+                            mActiveGeoTune = null;
+                        }
+                    });
         }
 
     }

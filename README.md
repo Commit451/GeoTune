@@ -2,7 +2,9 @@
 
 Setup some tunes that play when you enter geofences, aka GeoTunes!
 
-![screenshot](https://github.com/Commit451/GeoTune/raw/master/assets/screenshot-1.png)
+<img src="/assets/screenshot-1.png?raw=true" width="200px">
+<img src="/assets/screenshot-2.png?raw=true" width="200px">
+<img src="/assets/screenshot-3.png?raw=true" width="200px">
 
 <a href="https://play.google.com/store/apps/details?id=com.jawnnypoo.geotune">
   <img alt="Get it on Google Play"

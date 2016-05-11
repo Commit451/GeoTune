@@ -36,7 +36,6 @@ import com.jawnnypoo.geotune.data.GeoTune;
 import com.jawnnypoo.geotune.misc.AnimUtils;
 import com.jawnnypoo.geotune.misc.LocationUtils;
 import com.jawnnypoo.geotune.service.GeoTuneModService;
-import com.jawnnypoo.geotune.util.PrefUtils;
 
 import org.adw.library.widgets.discreteseekbar.DiscreteSeekBar;
 
@@ -288,20 +287,6 @@ public class GeoMapActivity extends BaseActivity {
         if (mStartingGeoTune != null) {
             LatLng geoTuneLatLng = new LatLng(mStartingGeoTune.getLatitude(), mStartingGeoTune.getLongitude());
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(geoTuneLatLng, LocationUtils.ZOOM_LEVEL));
-        } else {
-            LatLng savedLocation = PrefUtils.getLocation(this);
-            if (savedLocation != null) {
-                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(savedLocation, LocationUtils.ZOOM_LEVEL));
-            }
-            mMap.setMyLocationEnabled(true);
-            mMap.setOnMyLocationChangeListener(new GoogleMap.OnMyLocationChangeListener() {
-                @Override
-                public void onMyLocationChange(Location location) {
-                    moveCameraToCurrentLocation(location);
-                    PrefUtils.setLocation(GeoMapActivity.this, new LatLng(location.getLatitude(), location.getLongitude()));
-                    mMap.setOnMyLocationChangeListener(null);
-                }
-            });
         }
     }
 

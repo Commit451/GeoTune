@@ -1,11 +1,12 @@
 #GeoTune
 
 Setup some tunes that play when you enter geofences, aka GeoTunes!
-![screenshot](https://github.com/Jawnnypoo/GeoTune/raw/master/assets/screenshot-1.png)
+
+![screenshot](https://github.com/Commit451/GeoTune/raw/master/assets/screenshot-1.png)
 
 <a href="https://play.google.com/store/apps/details?id=com.jawnnypoo.geotune">
   <img alt="Get it on Google Play"
-       src="https://github.com/Jawnnypoo/GeoTune/raw/master/assets/google-play-badge-small.png" />
+       src="https://github.com/Commit451/GeoTune/raw/master/assets/google-play-badge-small.png" />
 </a>
 
 #Technical
@@ -27,7 +28,7 @@ Pull requests are welcomed and encouraged. If you experience any bugs, please [f
 License
 =======
 
-    Copyright 2015 John Carlson
+    Copyright 2015 Commit 451
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.

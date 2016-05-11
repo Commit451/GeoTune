@@ -7,8 +7,14 @@
     <!-- To restore previously registered geofences -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
+    <!-- Required for Maps -->
     <uses-permission android:name="android.permission.INTERNET"/>
+    <!-- Geofences require this permission -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <!--End permissions for maps-->
+
+    <!-- Required in order to play the notification tone to the user -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
 
     <application
         android:name="GeoTuneApp"

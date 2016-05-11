@@ -96,14 +96,21 @@ public class GeoTuneModService extends IntentService {
         GeoTune geoTune = intent.getParcelableExtra(EXTRA_GEOTUNE);
         GoogleApiClient apiClient = getConnectedApiClient();
         if (apiClient != null) {
-            LocationServices.GeofencingApi.addGeofences(apiClient,
-                    new GeofencingRequest.Builder()
-                            .addGeofence(geoTune.toGeofence())
-                            .build(),
-                    getGeofenceTransitionPendingIntent());
+            boolean itWorked = false;
+            try {
+                LocationServices.GeofencingApi.addGeofences(apiClient,
+                        new GeofencingRequest.Builder()
+                                .addGeofence(geoTune.toGeofence())
+                                .build(),
+                        getGeofenceTransitionPendingIntent());
+                itWorked = true;
+            } catch (SecurityException e) {
+                //They should have already accepted the permission if we got here
+                Timber.e(e, null);
+            }
             //Now update in the DB
             ContentValues cv = new ContentValues();
-            cv.put(GeoTune.KEY_ACTIVE, true);
+            cv.put(GeoTune.KEY_ACTIVE, itWorked);
             intent.putExtra(EXTRA_CONTENT_VALUES, cv);
             intent.putExtra(EXTRA_GEOTUNE_ID, geoTune.getId());
             updateGeoTune(intent);
@@ -121,9 +128,13 @@ public class GeoTuneModService extends IntentService {
             for (GeoTune geoTune : geoTunes) {
                 request.addGeofence(geoTune.toGeofence());
             }
-            LocationServices.GeofencingApi.addGeofences(apiClient,
-                    request.build(),
-                    getGeofenceTransitionPendingIntent());
+            try {
+                LocationServices.GeofencingApi.addGeofences(apiClient,
+                        request.build(),
+                        getGeofenceTransitionPendingIntent());
+            } catch (SecurityException e) {
+                Timber.e(e, null);
+            }
             Timber.d("All geofences reregistered");
         } else {
             Timber.e("Reregsiter failed");
@@ -152,7 +163,7 @@ public class GeoTuneModService extends IntentService {
         GoogleApiClient apiClient = new GoogleApiClient.Builder(this)
                 .addApi(LocationServices.API)
                 .build();
-        ConnectionResult connectionResult = apiClient.blockingConnect(5, TimeUnit.SECONDS);
+        ConnectionResult connectionResult = apiClient.blockingConnect(10, TimeUnit.SECONDS);
         if (connectionResult.isSuccess()) {
             return apiClient;
         } else {

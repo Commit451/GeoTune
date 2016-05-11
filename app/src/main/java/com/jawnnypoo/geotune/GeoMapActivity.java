@@ -1,13 +1,18 @@
 package com.jawnnypoo.geotune;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.Point;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.Display;
@@ -61,6 +66,7 @@ public class GeoMapActivity extends BaseActivity {
     private static final float LIME_HUE = 69.0f;
 
     private static final int REQUEST_PLACE = 1;
+    private static final int REQUEST_PERMISSION_FINE_LOCATION = 2;
 
     private MapFragment mMapFragment;
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
@@ -101,12 +107,14 @@ public class GeoMapActivity extends BaseActivity {
     private final View.OnClickListener mOnDoneClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            GeoTune geoTune = createGeoTuneFromValues();
-            GeoTuneModService.addGeoTune(GeoMapActivity.this, geoTune.toContentValues());
-            Intent intent = new Intent();
-            intent.putExtra(MainActivity.EXTRA_GEOTUNE, geoTune);
-            setResult(RESULT_OK, intent);
-            finish();
+            int permissionCheck = ContextCompat.checkSelfPermission(GeoMapActivity.this, Manifest.permission.ACCESS_FINE_LOCATION);
+            if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
+                saveGeoTune();
+            } else {
+                ActivityCompat.requestPermissions(GeoMapActivity.this,
+                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                        REQUEST_PERMISSION_FINE_LOCATION);
+            }
         }
     };
 
@@ -196,6 +204,15 @@ public class GeoMapActivity extends BaseActivity {
         }
     }
 
+    private void saveGeoTune() {
+        GeoTune geoTune = createGeoTuneFromValues();
+        GeoTuneModService.addGeoTune(GeoMapActivity.this, geoTune.toContentValues());
+        Intent intent = new Intent();
+        intent.putExtra(MainActivity.EXTRA_GEOTUNE, geoTune);
+        setResult(RESULT_OK, intent);
+        finish();
+    }
+
     private GeoTune createGeoTuneFromValues() {
         LatLng loc = mCurrentMarker.getPosition();
         double radius = mCurrentRadius.getRadius();
@@ -232,6 +249,18 @@ public class GeoMapActivity extends BaseActivity {
                     }
                 }
                 break;
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode) {
+            case REQUEST_PERMISSION_FINE_LOCATION:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // permission was granted, yay!
+                    saveGeoTune();
+                }
         }
     }
 

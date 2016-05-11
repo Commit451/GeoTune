@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        style="@style/Text.Choose"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/notification_tone"
+        android:id="@+id/choice_notification"
+        android:padding="@dimen/margin_small"
+        android:background="?attr/selectableItemBackground"
+        android:drawableLeft="@drawable/ic_notification"
+        android:gravity="center_vertical"
+        android:drawablePadding="@dimen/margin_small"/>
+
+    <TextView
+        style="@style/Text.Choose"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/media_file"
+        android:id="@+id/choice_media"
+        android:padding="@dimen/margin_small"
+        android:background="?attr/selectableItemBackground"
+        android:gravity="center_vertical"
+        android:drawableLeft="@drawable/ic_media"
+        android:drawablePadding="@dimen/margin_small"/>
+</LinearLayout>

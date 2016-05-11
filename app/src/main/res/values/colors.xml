@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="white">#ffffff</color>
+    <color name="white_80">#ccffffff</color>
+    <color name="that_gray">#c7c7c7</color>
+    <color name="text_gray">#323232</color>
+    <color name="light_gray_50">#80c0c0c0</color>
+    <color name="lime">#c6de39</color>
+    <color name="teal">#00bfa5</color>
+    <color name="teal_50">#8000bfa5</color>
+    <color name="teal_pressed">#009688</color>
+</resources>

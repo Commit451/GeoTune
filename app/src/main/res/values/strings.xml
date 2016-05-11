@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">GeoTune</string>
+    <!-- UI -->
+    <string name="latitude">Latitude</string>
+    <string name="longitude">Longitude</string>
+    <string name="menu_item_add_geofence">Add Geofence</string>
+    <string name="menu_item_delete_geofences">Delete Geofences</string>
+    <string name="menu_item_location">Set Fake Location</string>
+    <string name="radius">Radius</string>
+    <string name="about">About</string>
+    <string name="done">Done</string>
+    <string name="add_geotune">Add GeoTune</string>
+    <string name="new_geotune">New GeoTune</string>
+    <string name="name">Name</string>
+    <string name="geotune_name">GeoTune Name</string>
+    <string name="geotune">GeoTune</string>
+    <string name="name_your_geotune">Name Your GeoTune</string>
+    <string name="choose_tune">Choose Tune</string>
+    <string name="create_geotune">Create GeoTune</string>
+    <string name="default_notification_tone">Default Notification Tone</string>
+    <string name="edit_name">Edit GeoTune Name</string>
+    <string name="rename">Rename</string>
+    <string name="delete">Delete</string>
+    <string name="search">Search</string>
+    <string name="reminder_set_tune">Don\'t forget to set your tune!</string>
+    <string name="search_for_address">Search for address</string>
+    <string name="map_hint">Long press or search to add a GeoTune</string>
+    <string name="notification_tone">Notification Tone</string>
+    <string name="ringtone">Ringtone</string>
+    <string name="media_file">Media File</string>
+    <string name="error_invalid_address">Not found. Long press for custom placement</string>
+
+    <!--About-->
+    <string name="john_credit"><b>Programming</b>\n<u>John Carlson</u></string>
+    <string name="kyrsten_credit"><b>UX/UI</b>\n<u>Kyrsten Carlson</u></string>
+    <string name="libraries_used"><b>Open Source Libraries used:</b></string>
+    <string name="libraries">ButterKnife - Jake Wharton\nTimber - Jake Wharton\ndiscreteSeekBar - AnderWeb\n</string>
+
+    <string name="apache_license"><u>View the Apache License</u></string>
+    <string name="apache_url">http://www.apache.org/licenses/LICENSE-2.0.html</string>
+    <string name="jawn_url">http://bit.ly/jawnnypoo</string>
+    <string name="kyrsten_url">http://bit.ly/kykabu</string>
+
+</resources>
+

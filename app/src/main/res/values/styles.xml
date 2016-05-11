@@ -1,0 +1,93 @@
+<resources>
+
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- Here we setting appcompat’s actionBarStyle -->
+
+        <!-- colorPrimary is used for the default action bar background -->
+        <item name="colorPrimary">@color/teal</item>
+
+        <!-- colorPrimaryDark is used for the status bar -->
+        <item name="colorPrimaryDark">@color/teal_pressed</item>
+        <item name="android:navigationBarColor">@color/teal_pressed</item>
+
+        <!-- colorAccent is used as the default value for colorControlActivated
+             which is used to tint widgets -->
+        <item name="colorAccent">@color/lime</item>
+
+        <item name="colorControlHighlight">@color/lime</item>
+        <item name="colorControlActivated">@color/teal</item>
+        <item name="colorSwitchThumbNormal">@color/that_gray</item>
+
+        <!-- You can also set colorControlNormal, colorControlActivated
+             colorControlHighlight & colorSwitchThumbNormal. -->
+
+        <!-- The rest of your attributes -->
+        <item name="android:windowBackground">@color/that_gray</item>
+    </style>
+
+    <style name="Transparent" parent="AppTheme">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+    </style>
+
+    <style name="DialogStyle" parent="Theme.AppCompat.Light.Dialog">
+    </style>
+
+    <style name="ToolBarStyle">
+        <item name="android:textColorPrimary">@color/white</item>
+        <item name="android:textColorSecondary">@color/white</item>
+        <item name="actionMenuTextColor">@color/white</item>
+        <item name="colorControlNormal">@color/white</item>
+    </style>
+
+    <style name="ToolbarTitle" parent="TextAppearance.Widget.AppCompat.Toolbar.Title">
+        <item name="android:textColor">@color/white</item>
+    </style>
+
+    <style name="Text">
+        <item name="android:textColor">@color/text_gray</item>
+        <item name="android:textSize">@dimen/text_size_normal</item>
+    </style>
+
+    <style name="Text.GeoTuneName">
+        <item name="android:textSize">@dimen/text_size_huge</item>
+    </style>
+
+    <style name="Text.GeoTuneTune">
+        <item name="android:textSize">@dimen/text_size_normal</item>
+        <item name="android:textColor">@color/teal</item>
+    </style>
+
+    <style name="Text.Choose">
+        <item name="android:textSize">@dimen/text_size_large</item>
+    </style>
+
+    <style name="Text.Header">
+        <item name="android:textColor">@color/text_gray</item>
+        <item name="android:textSize">@dimen/text_size_normal</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="Text.Address">
+        <item name="android:textColor">@color/text_gray</item>
+        <item name="android:textSize">@dimen/text_size_normal</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="Text.About">
+        <item name="android:textColor">@color/teal</item>
+        <item name="android:textSize">@dimen/text_size_normal</item>
+    </style>
+
+    <style name="Text.About.Libraries">
+        <item name="android:textSize">@dimen/text_size_small</item>
+    </style>
+
+    <style name="Card">
+        <item name="cardUseCompatPadding">true</item>
+        <item name="cardElevation">@dimen/elevation_large</item>
+        <item name="cardCornerRadius">1dp</item>
+        <item name="cardBackgroundColor">@color/white</item>
+    </style>
+
+</resources>

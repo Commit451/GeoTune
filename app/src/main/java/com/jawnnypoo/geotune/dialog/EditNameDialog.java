@@ -51,6 +51,6 @@ public class EditNameDialog extends AppCompatDialog {
     }
 
     public void setName(String name) {
-        mName.setText(name);
+        mName.append(name);
     }
 }

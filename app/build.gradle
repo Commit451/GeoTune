@@ -14,8 +14,8 @@ android {
         applicationId "com.jawnnypoo.geotune"
         minSdkVersion 16
         targetSdkVersion 23
-        versionCode 110
-        versionName "1.1.0"
+        versionCode 111
+        versionName "1.1.1"
         manifestPlaceholders = [
                 google_api_key: project.ext.GEOTUNE_GOOGLE_API_KEY,
                 fabric_key : project.ext.GEOTUNE_FABRIC_KEY

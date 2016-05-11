@@ -32,22 +32,14 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.SwitchCompat;
-import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.CompoundButton;
-import android.widget.ImageView;
-import android.widget.PopupMenu;
-import android.widget.TextView;
 
+import com.jawnnypoo.geotune.adapter.GeoTuneAdapter;
 import com.jawnnypoo.geotune.data.GeoTune;
 import com.jawnnypoo.geotune.dialog.ChooseUriDialog;
 import com.jawnnypoo.geotune.dialog.EditNameDialog;
 import com.jawnnypoo.geotune.loader.GeoTunesLoader;
 import com.jawnnypoo.geotune.service.GeoTuneModService;
-import com.jawnnypoo.geotune.task.GetFileNameTask;
 import com.jawnnypoo.geotune.util.NotificationUtils;
 
 import java.util.ArrayList;
@@ -62,7 +54,7 @@ import timber.log.Timber;
  */
 public class MainActivity extends BaseActivity implements LoaderManager.LoaderCallbacks<ArrayList<GeoTune>> {
 
-    private static final String STATE_ACTIVE_INDEX = "STATE_ACTIVE_INDEX";
+    private static final String STATE_ACTIVE_GEOTUNE = "active_geotune";
 
     private static final int LOADER_GEOTUNES = 123;
 
@@ -77,14 +69,14 @@ public class MainActivity extends BaseActivity implements LoaderManager.LoaderCa
     @BindView(R.id.fab) View mFab;
     @BindView(R.id.empty_view) View mEmptyView;
     //Data
-    private int mActivePosition = -1;
-    private GeofenceAdapter mGeofenceAdapter;
+    private GeoTune mActiveGeoTune;
+    private GeoTuneAdapter mGeoTuneAdapter;
 
     private final View.OnClickListener mOnAddClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
             int[] location = {(int) mFab.getX(), (int) mFab.getY()};
-            navigateToMap(location, mGeofenceAdapter.mGeoTunes);
+            navigateToMap(location, mGeoTuneAdapter.getGeoTunes());
         }
     };
 
@@ -106,9 +98,58 @@ public class MainActivity extends BaseActivity implements LoaderManager.LoaderCa
 
     private final EditNameDialog.OnEditNameDialogListener mEditNameListener = new EditNameDialog.OnEditNameDialogListener() {
         @Override
-        public void onNameEdited(int position, String name) {
-            mGeofenceAdapter.setGeoTuneName(position, name);
+        public void onNameEdited(String name) {
+            mActiveGeoTune.setName(name);
+            mGeoTuneAdapter.onGeoTuneChanged(mActiveGeoTune);
             mEditNameDialog.dismiss();
+            ContentValues cv = new ContentValues();
+            cv.put(GeoTune.KEY_NAME, name);
+            GeoTuneModService.updateGeoTune(MainActivity.this, cv, mActiveGeoTune.getId());
+            mActiveGeoTune = null;
+        }
+    };
+
+    private final GeoTuneAdapter.Callback mCallback = new GeoTuneAdapter.Callback() {
+        @Override
+        public void onSetNotificationClicked(GeoTune geoTune) {
+            mActiveGeoTune = geoTune;
+            int permissionCheck = ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE);
+            if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
+                mChooseUriDialog.show();
+            } else {
+                ActivityCompat.requestPermissions(MainActivity.this,
+                        new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                        PERMISSION_REQUEST_SAVE_TONE_WRITE_EXTERNAL_STORAGE);
+            }
+        }
+
+        @Override
+        public void onRenameClicked(GeoTune geoTune) {
+            mActiveGeoTune = geoTune;
+            mEditNameDialog.setName(geoTune.getName());
+            mEditNameDialog.show();
+        }
+
+        @Override
+        public void onDeleteClicked(GeoTune geoTune) {
+            GeoTuneModService.deleteGeoTune(MainActivity.this, geoTune);
+            adapterDataChanged();
+        }
+
+        @Override
+        public void onGeoTuneSwitched(boolean isChecked, GeoTune geoTune) {
+            //Update with GPlay
+            if (isChecked) {
+                GeoTuneModService.registerGeoTune(getApplicationContext(), geoTune);
+            } else {
+                GeoTuneModService.unregisterGeoTune(getApplicationContext(), geoTune);
+            }
+        }
+
+        @Override
+        public void onGeoTuneClicked(GeoTune geoTune) {
+            int[] location = {(int) mFab.getX(), (int) mFab.getY()};
+            navigateToMap(location, mGeoTuneAdapter.getGeoTunes(), geoTune);
         }
     };
 
@@ -124,13 +165,15 @@ public class MainActivity extends BaseActivity implements LoaderManager.LoaderCa
         ButterKnife.bind(this);
 
         if (savedInstanceState != null) {
-            mActivePosition = savedInstanceState.getInt(STATE_ACTIVE_INDEX);
+            mActiveGeoTune = savedInstanceState.getParcelable(STATE_ACTIVE_GEOTUNE);
         }
 
         mFab.setOnClickListener(mOnAddClickListener);
         mEmptyView.setOnClickListener(mOnAddClickListener);
 
-        setupGeofenceList();
+        mListGeofences.setLayoutManager(new LinearLayoutManager(this));
+        mGeoTuneAdapter = new GeoTuneAdapter(mCallback);
+        mListGeofences.setAdapter(mGeoTuneAdapter);
 
         setupDialogs();
         getLoaderManager().initLoader(LOADER_GEOTUNES, null, this);
@@ -143,22 +186,16 @@ public class MainActivity extends BaseActivity implements LoaderManager.LoaderCa
         mChooseUriDialog.setOnUriChoiceMadeListener(mOnUriChoiceListener);
     }
 
-    private void setupGeofenceList() {
-        mListGeofences.setLayoutManager(new LinearLayoutManager(this));
-        mGeofenceAdapter = new GeofenceAdapter(new ArrayList<GeoTune>());
-        mListGeofences.setAdapter(mGeofenceAdapter);
-    }
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         switch (requestCode) {
             case REQUEST_GEOFENCE:
                 if (resultCode == RESULT_OK && data != null) {
-                    Timber.d("adding geofence onAcitivityResult");
                     GeoTune newGeoTune = data.getParcelableExtra(EXTRA_GEOTUNE);
                     newGeoTune.setActive(true);
-                    mGeofenceAdapter.addGeoTune(newGeoTune);
+                    mGeoTuneAdapter.addGeoTune(newGeoTune);
+                    adapterDataChanged();
                     GeoTuneModService.registerGeoTune(getApplicationContext(), newGeoTune);
                     Snackbar.make(mRoot, getString(R.string.reminder_set_tune), Snackbar.LENGTH_LONG)
                             .show();
@@ -167,26 +204,33 @@ public class MainActivity extends BaseActivity implements LoaderManager.LoaderCa
             case REQUEST_AUDIO:
                 if (resultCode == RESULT_OK) {
                     if (data.getData() != null) {
-                        Timber.d("Uri was found: " + data.getData());
-                        if (mActivePosition != -1) {
-                            GeoTune geoTune = mGeofenceAdapter.getGeoTune(mActivePosition);
-                            mGeofenceAdapter.setUri(mActivePosition, data.getData());
-                            NotificationUtils.playTune(this, geoTune);
-                            mActivePosition = -1;
-                        }
+                        Timber.d("Uri was found: %s", data.getData());
+                        updateGeotuneUri(data.getData());
                     }
                 }
                 break;
             case REQUEST_NOTIFICATION:
                 if (resultCode == RESULT_OK) {
                     Uri uri = data.getParcelableExtra(RingtoneManager.EXTRA_RINGTONE_PICKED_URI);
-                    if (mActivePosition != -1) {
-                        mGeofenceAdapter.setUri(mActivePosition, uri);
-                        mActivePosition = -1;
-                    }
+                    updateGeotuneUri(uri);
                 }
                 break;
         }
+    }
+
+    private void updateGeotuneUri(Uri uri) {
+        if (mActiveGeoTune != null) {
+            mActiveGeoTune.setTuneUri(uri);
+            mGeoTuneAdapter.onGeoTuneChanged(mActiveGeoTune);
+            NotificationUtils.playTune(this, mActiveGeoTune);
+            ContentValues cv = new ContentValues();
+            cv.put(GeoTune.KEY_TUNE, uri.toString());
+            GeoTuneModService.updateGeoTune(MainActivity.this, cv, mActiveGeoTune.getId());
+            //TODO
+            //new GetFileNameTask(MainActivity.this, mActiveGeoTune, this).execute(uri);
+            mActiveGeoTune = null;
+        }
+
     }
 
     @TargetApi(23)
@@ -204,7 +248,7 @@ public class MainActivity extends BaseActivity implements LoaderManager.LoaderCa
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putInt(STATE_ACTIVE_INDEX, mActivePosition);
+        outState.putParcelable(STATE_ACTIVE_GEOTUNE, mActiveGeoTune);
     }
 
     @Override
@@ -221,10 +265,11 @@ public class MainActivity extends BaseActivity implements LoaderManager.LoaderCa
     public void onLoadFinished(Loader<ArrayList<GeoTune>> loader, ArrayList<GeoTune> data) {
         switch (loader.getId()) {
             case LOADER_GEOTUNES:
-                if (data != null && mGeofenceAdapter != null) {
+                if (data != null && mGeoTuneAdapter != null) {
                     Timber.d("onLoadFinished");
-                    mGeofenceAdapter.setGeofences(data);
+                    mGeoTuneAdapter.setGeofences(data);
                 }
+                adapterDataChanged();
                 break;
         }
     }
@@ -244,174 +289,10 @@ public class MainActivity extends BaseActivity implements LoaderManager.LoaderCa
      * Normally you would do this in an observer, but oh well
      */
     private void adapterDataChanged() {
-        if (mGeofenceAdapter.getItemCount() > 0) {
+        if (mGeoTuneAdapter.getItemCount() > 0) {
             mEmptyView.setVisibility(View.GONE);
         } else {
             mEmptyView.setVisibility(View.VISIBLE);
         }
-    }
-
-    public class GeofenceAdapter extends RecyclerView.Adapter<GeofenceAdapter.Holder> {
-
-        public class Holder extends RecyclerView.ViewHolder implements View.OnClickListener,
-                PopupMenu.OnMenuItemClickListener, CompoundButton.OnCheckedChangeListener {
-            View card;
-            TextView name;
-            TextView tune;
-            SwitchCompat datSwitch;
-            ImageView overflow;
-
-            public Holder(View view) {
-                super(view);
-                card = view.findViewById(R.id.card_view);
-                name = (TextView) view.findViewById(R.id.geotune_name);
-                tune = (TextView) view.findViewById(R.id.geotune_tune);
-                card.setOnClickListener(this);
-                tune.setOnClickListener(this);
-                datSwitch = (SwitchCompat) view.findViewById(R.id.geotune_switch);
-                datSwitch.setOnCheckedChangeListener(this);
-                overflow = (ImageView) view.findViewById(R.id.geotune_overflow);
-                final PopupMenu popup = new PopupMenu(view.getContext(), overflow);
-                popup.getMenuInflater().inflate(R.menu.geotune_menu, popup.getMenu());
-                popup.setOnMenuItemClickListener(this);
-                overflow.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        popup.show();
-                    }
-                });
-            }
-
-            @Override
-            public void onClick(View v) {
-                switch (v.getId()) {
-                    case R.id.geotune_tune:
-                        mActivePosition = getPosition();
-                        int permissionCheck = ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE);
-                        if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
-                            mChooseUriDialog.show();
-                        } else {
-                            ActivityCompat.requestPermissions(MainActivity.this,
-                                    new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
-                                    PERMISSION_REQUEST_SAVE_TONE_WRITE_EXTERNAL_STORAGE);
-                        }
-                        break;
-                    default:
-                        int[] location = {(int) mFab.getX(), (int) mFab.getY()};
-                        navigateToMap(location, mGeofenceAdapter.mGeoTunes, mGeoTunes.get(getPosition()));
-                }
-            }
-
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                switch (item.getItemId()) {
-                    case R.id.action_rename:
-                        mEditNameDialog.setPosition(getPosition());
-                        mEditNameDialog.setName(getGeoTune(getPosition()).getName());
-                        mEditNameDialog.show();
-                        return true;
-                    case R.id.action_delete:
-                        GeoTune geoTune = mGeofenceAdapter.getGeoTune(getPosition());
-                        GeoTuneModService.deleteGeoTune(MainActivity.this, geoTune);
-                        mGeofenceAdapter.removeGeoTune(getPosition());
-                        return true;
-                }
-                return false;
-            }
-
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                GeoTune geoTune = mGeofenceAdapter.getGeoTune(getPosition());
-                if (isChecked == geoTune.isActive()) {
-                    return;
-                }
-                geoTune.setActive(isChecked);
-                //Update with GPlay
-                if (isChecked) {
-                    GeoTuneModService.registerGeoTune(getApplicationContext(), geoTune);
-                } else {
-                    GeoTuneModService.unregisterGeoTune(getApplicationContext(), geoTune);
-                }
-            }
-        }
-
-        private ArrayList<GeoTune> mGeoTunes;
-
-        public GeofenceAdapter(ArrayList<GeoTune> objects) {
-            mGeoTunes = objects;
-        }
-
-        @Override
-        public Holder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
-            // create a new view
-            View v = LayoutInflater.from(viewGroup.getContext())
-                    .inflate(R.layout.item_geofence, viewGroup, false);
-            // set the view's size, margins, paddings and layout parameters
-            return new Holder(v);
-        }
-
-        @Override
-        public void onBindViewHolder(Holder viewHolder, int position) {
-            GeoTune geoTune = getGeoTune(position);
-            viewHolder.name.setText(geoTune.getName());
-            if (geoTune.getTuneUri() == null) {
-                viewHolder.tune.setText(getString(R.string.default_notification_tone));
-            } else {
-                if (geoTune.getTuneName() == null) {
-                    viewHolder.tune.setText("");
-                    new GetFileNameTask(MainActivity.this, geoTune, this).execute(geoTune.getTuneUri());
-                } else {
-                    viewHolder.tune.setText(geoTune.getTuneName());
-                }
-            }
-            viewHolder.datSwitch.setChecked(geoTune.isActive());
-        }
-
-        @Override
-        public int getItemCount() {
-            return mGeoTunes.size();
-        }
-
-        public void setGeofences(ArrayList<GeoTune> geoTunes) {
-            mGeoTunes = geoTunes;
-            notifyDataSetChanged();
-            adapterDataChanged();
-        }
-
-        public void addGeoTune(GeoTune geofence) {
-            mGeoTunes.add(geofence);
-            notifyItemInserted(mGeoTunes.size() - 1);
-            adapterDataChanged();
-        }
-
-        public void removeGeoTune(int position) {
-            mGeoTunes.remove(position);
-            notifyItemRemoved(position);
-            adapterDataChanged();
-        }
-
-        public GeoTune getGeoTune(int position) {
-            return mGeoTunes.get(position);
-        }
-
-        public void setUri(int position, Uri uri) {
-            Timber.d("Setting uri of item " + position);
-            mGeoTunes.get(position).setTuneUri(uri);
-            ContentValues cv = new ContentValues();
-            cv.put(GeoTune.KEY_TUNE, uri.toString());
-            GeoTuneModService.updateGeoTune(MainActivity.this, cv, mGeoTunes.get(position).getId());
-            new GetFileNameTask(MainActivity.this, mGeoTunes.get(position), this).execute(uri);
-            notifyDataSetChanged();
-        }
-
-        public void setGeoTuneName(int position, String name) {
-            GeoTune geoTune = mGeoTunes.get(position);
-            geoTune.setName(name);
-            ContentValues cv = new ContentValues();
-            cv.put(GeoTune.KEY_NAME, name);
-            GeoTuneModService.updateGeoTune(MainActivity.this, cv, geoTune.getId());
-            notifyDataSetChanged();
-        }
-
     }
 }

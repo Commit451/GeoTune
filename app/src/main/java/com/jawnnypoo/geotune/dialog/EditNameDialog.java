@@ -18,10 +18,8 @@ public class EditNameDialog extends AppCompatDialog {
 
     private OnEditNameDialogListener mListener;
 
-    private int mPosition;
-
     public interface OnEditNameDialogListener {
-        void onNameEdited(int position, String name);
+        void onNameEdited(String name);
     }
 
     @OnClick(R.id.done)
@@ -44,16 +42,12 @@ public class EditNameDialog extends AppCompatDialog {
 
     private void returnName() {
         if (mListener != null) {
-            mListener.onNameEdited(mPosition, mName.getText().toString());
+            mListener.onNameEdited(mName.getText().toString());
         }
     }
 
     public void setOnEditNameListener(OnEditNameDialogListener listener) {
         mListener = listener;
-    }
-
-    public void setPosition(int position) {
-        mPosition = position;
     }
 
     public void setName(String name) {

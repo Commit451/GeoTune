@@ -212,6 +212,22 @@ public class GeoTune implements Parcelable {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        GeoTune geoTune = (GeoTune) o;
+
+        return mId != null ? mId.equals(geoTune.mId) : geoTune.mId == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        return mId != null ? mId.hashCode() : 0;
+    }
+
+    @Override
     public int describeContents() {
         return 0;
     }

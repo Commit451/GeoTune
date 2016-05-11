@@ -23,6 +23,7 @@
 
         <!-- The rest of your attributes -->
         <item name="android:windowBackground">@color/that_gray</item>
+        <item name="dialogTheme">@style/Theme.App.AppCompatDialogStyle</item>
     </style>
 
     <style name="Transparent" parent="AppTheme">
@@ -31,6 +32,10 @@
     </style>
 
     <style name="DialogStyle" parent="Theme.AppCompat.Light.Dialog">
+    </style>
+
+    <style name="Theme.App.AppCompatDialogStyle" parent="Theme.AppCompat.Light.Dialog">
+        <item name="windowNoTitle">true</item> <!-- that's the important bit -->
     </style>
 
     <style name="ToolBarStyle">

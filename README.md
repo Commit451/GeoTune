@@ -2,13 +2,13 @@
 
 Setup some tunes that play when you enter geofences, aka GeoTunes!
 
-<img src="/assets/screenshot-1.png?raw=true" width="200px">
-<img src="/assets/screenshot-2.png?raw=true" width="200px">
-<img src="/assets/screenshot-3.png?raw=true" width="200px">
+<img src="/art/screenshot-1.png?raw=true" width="200px">
+<img src="/art/screenshot-2.png?raw=true" width="200px">
+<img src="/art/screenshot-3.png?raw=true" width="200px">
 
 <a href="https://play.google.com/store/apps/details?id=com.jawnnypoo.geotune">
   <img alt="Get it on Google Play"
-       src="https://github.com/Commit451/GeoTune/raw/master/assets/google-play-badge-small.png" />
+       src="art/google-play-badge-small.png?raw=true" />
 </a>
 
 #Technical

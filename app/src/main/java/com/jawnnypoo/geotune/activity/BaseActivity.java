@@ -1,10 +1,11 @@
-package com.jawnnypoo.geotune;
+package com.jawnnypoo.geotune.activity;
 
 import android.content.Intent;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 
+import com.jawnnypoo.geotune.R;
 import com.jawnnypoo.geotune.data.GeoTune;
 
 import java.util.ArrayList;

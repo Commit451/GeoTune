@@ -17,7 +17,7 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
 
     <application
-        android:name="GeoTuneApp"
+        android:name=".App"
         android:allowBackup="true"
         android:fullBackupContent="true"
         android:icon="@mipmap/ic_launcher"
@@ -43,7 +43,7 @@
             android:exported="false"/>
 
         <activity
-            android:name="com.jawnnypoo.geotune.MainActivity">
+            android:name="com.jawnnypoo.geotune.activity.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
@@ -51,12 +51,12 @@
         </activity>
 
         <activity
-            android:name=".GeoMapActivity"
+            android:name=".activity.GeoMapActivity"
             android:launchMode="singleTop"
             android:theme="@style/Transparent"
             android:windowSoftInputMode="stateHidden"/>
 
-        <activity android:name=".AboutActivity"/>
+        <activity android:name=".activity.AboutActivity"/>
 
         <service
             android:name=".service.GeofenceTransitionsIntentService"

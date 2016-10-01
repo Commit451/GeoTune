@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.jawnnypoo.geotune;
+package com.jawnnypoo.geotune.activity;
 
 import android.Manifest;
 import android.annotation.TargetApi;
@@ -34,6 +34,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
+import com.jawnnypoo.geotune.R;
 import com.jawnnypoo.geotune.adapter.GeoTuneAdapter;
 import com.jawnnypoo.geotune.data.GeoTune;
 import com.jawnnypoo.geotune.dialog.ChooseUriDialog;
@@ -290,7 +291,7 @@ public class MainActivity extends BaseActivity implements LoaderManager.LoaderCa
     public void onLoaderReset(Loader loader) {}
 
     private ArrayList<GeoTune> getFakeGeofenceList(int number) {
-        ArrayList<GeoTune> geofences = new ArrayList<GeoTune>();
+        ArrayList<GeoTune> geofences = new ArrayList<>();
         for (int i = 0; i < number; i++) {
             geofences.add(new GeoTune("Neat " + i, String.valueOf(i), i, i, i, i, null, "Hi", true));
         }

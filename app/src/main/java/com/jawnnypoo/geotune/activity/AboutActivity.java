@@ -1,4 +1,4 @@
-package com.jawnnypoo.geotune;
+package com.jawnnypoo.geotune.activity;
 
 import android.content.Context;
 import android.content.Intent;
@@ -6,6 +6,8 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+
+import com.jawnnypoo.geotune.R;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -15,12 +17,12 @@ import butterknife.ButterKnife;
  */
 public class AboutActivity extends BaseActivity{
 
-    @BindView(R.id.toolbar) Toolbar mToolbar;
-
     public static Intent newInstance(Context context) {
         Intent intent = new Intent(context, AboutActivity.class);
         return intent;
     }
+
+    @BindView(R.id.toolbar) Toolbar mToolbar;
 
     private final View.OnClickListener mNavigationIconClickListener = new View.OnClickListener() {
         @Override

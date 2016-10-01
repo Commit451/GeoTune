@@ -8,7 +8,7 @@ import android.media.MediaPlayer;
 import android.media.RingtoneManager;
 import android.support.v4.app.NotificationCompat;
 
-import com.jawnnypoo.geotune.MainActivity;
+import com.jawnnypoo.geotune.activity.MainActivity;
 import com.jawnnypoo.geotune.R;
 import com.jawnnypoo.geotune.data.GeoTune;
 

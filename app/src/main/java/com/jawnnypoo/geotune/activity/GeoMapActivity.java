@@ -1,4 +1,4 @@
-package com.jawnnypoo.geotune;
+package com.jawnnypoo.geotune.activity;
 
 import android.Manifest;
 import android.content.Context;
@@ -37,6 +37,7 @@ import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.jawnnypoo.geotune.R;
 import com.jawnnypoo.geotune.data.GeoTune;
 import com.jawnnypoo.geotune.misc.AnimUtils;
 import com.jawnnypoo.geotune.misc.LocationUtils;
@@ -49,6 +50,7 @@ import java.util.UUID;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import timber.log.Timber;
 
 /**
@@ -68,27 +70,6 @@ public class GeoMapActivity extends BaseActivity {
     private static final int REQUEST_PLACE = 1;
     private static final int REQUEST_PERMISSION_FINE_LOCATION = 2;
 
-    private MapFragment mMapFragment;
-    private GoogleMap mMap; // Might be null if Google Play services APK is not available.
-    private Marker mCurrentMarker;
-    private Circle mCurrentRadius;
-    //Views
-    @BindView(R.id.activity_root)
-    View mRoot;
-    @BindView(R.id.map_overlay)
-    View mMapOverlay;
-    @BindView(R.id.toolbar)
-    Toolbar mToolbar;
-    @BindView(R.id.edit_name)
-    EditText mEditName;
-    @BindView(R.id.radius_bar)
-    DiscreteSeekBar mRadiusBar;
-
-    private GeoTune mStartingGeoTune;
-    private ArrayList<GeoTune> mGeoTunes;
-    private int mRadiusColor;
-    private int mScreenHeight;
-
     public static Intent newIntent(Context context, int[] point, ArrayList<GeoTune> geoTunes) {
         Intent intent = new Intent(context, GeoMapActivity.class);
         intent.putExtra(EXTRA_REVEAL_POINT, point);
@@ -104,19 +85,26 @@ public class GeoMapActivity extends BaseActivity {
         return intent;
     }
 
-    private final View.OnClickListener mOnDoneClickListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            int permissionCheck = ContextCompat.checkSelfPermission(GeoMapActivity.this, Manifest.permission.ACCESS_FINE_LOCATION);
-            if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
-                saveGeoTune();
-            } else {
-                ActivityCompat.requestPermissions(GeoMapActivity.this,
-                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                        REQUEST_PERMISSION_FINE_LOCATION);
-            }
-        }
-    };
+    @BindView(R.id.activity_root)
+    View mRoot;
+    @BindView(R.id.map_overlay)
+    View mMapOverlay;
+    @BindView(R.id.toolbar)
+    Toolbar mToolbar;
+    @BindView(R.id.edit_name)
+    EditText mEditName;
+    @BindView(R.id.radius_bar)
+    DiscreteSeekBar mRadiusBar;
+
+    MapFragment mMapFragment;
+    GoogleMap mMap;
+    Marker mCurrentMarker;
+    Circle mCurrentRadius;
+
+    GeoTune mStartingGeoTune;
+    ArrayList<GeoTune> mGeoTunes;
+    int mRadiusColor;
+    int mScreenHeight;
 
     private final DiscreteSeekBar.OnProgressChangeListener mOnProgressChangedListener = new DiscreteSeekBar.OnProgressChangeListener() {
         @Override
@@ -127,20 +115,34 @@ public class GeoMapActivity extends BaseActivity {
         }
     };
 
-    private View.OnClickListener mNavigationIconClickListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            onBackPressed();
+    @OnClick(R.id.fab)
+    void onDoneClicked() {
+        int permissionCheck = ContextCompat.checkSelfPermission(GeoMapActivity.this, Manifest.permission.ACCESS_FINE_LOCATION);
+        if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
+            saveGeoTune();
+        } else {
+            ActivityCompat.requestPermissions(GeoMapActivity.this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    REQUEST_PERMISSION_FINE_LOCATION);
         }
-    };
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_geo_map);
         ButterKnife.bind(this);
+
+        mGeoTunes = getIntent().getParcelableArrayListExtra(EXTRA_GEOTUNES);
+        mStartingGeoTune = getIntent().getParcelableExtra(EXTRA_STARTING_GEOTUNE);
+
         mToolbar.setNavigationIcon(R.drawable.ic_back);
-        mToolbar.setNavigationOnClickListener(mNavigationIconClickListener);
+        mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onBackPressed();
+            }
+        });
         mToolbar.inflateMenu(R.menu.map);
         mToolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
             @Override
@@ -159,10 +161,6 @@ public class GeoMapActivity extends BaseActivity {
 
         mRadiusBar.setOnProgressChangeListener(mOnProgressChangedListener);
 
-        findViewById(R.id.fab).setOnClickListener(mOnDoneClickListener);
-
-        mGeoTunes = getIntent().getParcelableArrayListExtra(EXTRA_GEOTUNES);
-        mStartingGeoTune = getIntent().getParcelableExtra(EXTRA_STARTING_GEOTUNE);
         if (savedInstanceState != null) {
         } else {
             final int[] revealPoint = getIntent().getIntArrayExtra(EXTRA_REVEAL_POINT);
@@ -208,7 +206,7 @@ public class GeoMapActivity extends BaseActivity {
         GeoTune geoTune = createGeoTuneFromValues();
         GeoTuneModService.addGeoTune(GeoMapActivity.this, geoTune.toContentValues());
         Intent intent = new Intent();
-        intent.putExtra(MainActivity.EXTRA_GEOTUNE, geoTune);
+        intent.putExtra(EXTRA_GEOTUNE, geoTune);
         setResult(RESULT_OK, intent);
         finish();
     }
@@ -381,7 +379,7 @@ public class GeoMapActivity extends BaseActivity {
     }
 
     private void hideKeyboard() {
-        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
         if (getCurrentFocus() != null && getCurrentFocus().getWindowToken() != null) {
             imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
         }

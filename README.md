@@ -1,4 +1,4 @@
-#GeoTune
+# GeoTune
 
 Setup some tunes that play when you enter geofences, aka GeoTunes!
 
@@ -11,20 +11,20 @@ Setup some tunes that play when you enter geofences, aka GeoTunes!
        src="art/google-play-badge-small.png?raw=true" />
 </a>
 
-#Technical
+# Technical
 This app provides a nice example of how to set up, register, use, reregister, and store geofences using the [Places API](https://developers.google.com/places/android-api/) from Google Play Services. It also uses the Places Autocomplete API to allow the user to input any location. GeoTunes are stored using a content provider, which is a bit of overkill, but meh. They are fetched using a Loader (oldskool) and stored using an IntentService.
 
-#Building
+# Building
 If you want the app to build properly, you will need to generate your own API key from the  [Google API Console](https://console.developers.google.com/) and add it to your gradle.properties file (create one in your home directory, under `.gradle`). The app also uses Fabric for Crashlytics, so you might need to generate your own Crashlytics key. All in all, your `gradle.properties` will look something like this:
 ```Gradle
 GEOTUNE_FABRIC_KEY = SomeKeyOnlyReallyNeededForReleaseBuilds
 GEOTUNE_GOOGLE_API_KEY = AIzaSySomeApiKeyThatYouHaveGenerated
 ```
 
-#Where's the History?
+# Where's the History?
 This app used to be closed source, and contained a bunch of API keys, so the git history had to be reset. Sorry to all you history buffs
 
-#Contribution
+# Contribution
 Pull requests are welcomed and encouraged. If you experience any bugs, please [file an issue](https://github.com/Commit451/GeoTune/issues/new)
 
 License

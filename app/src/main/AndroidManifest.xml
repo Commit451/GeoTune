@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="com.jawnnypoo.geotune"
-          android:installLocation="internalOnly">
+    package="com.jawnnypoo.geotune"
+    android:installLocation="internalOnly">
 
-    <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES"/>
+    <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
     <!-- To restore previously registered geofences -->
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <!-- Required for Maps -->
-    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.INTERNET" />
     <!-- Geofences require this permission -->
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <!--End permissions for maps-->
 
     <!-- Required in order to play the notification tone to the user -->
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <application
         android:name=".App"
@@ -26,27 +26,26 @@
 
         <meta-data
             android:name="io.fabric.ApiKey"
-            android:value="${fabric_key}"/>
+            android:value="${fabric_key}" />
 
         <meta-data
             android:name="com.google.android.gms.version"
-            android:value="@integer/google_play_services_version"/>
+            android:value="@integer/google_play_services_version" />
 
         <!-- For Maps and Places API -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="${google_api_key}"/>
+            android:value="${google_api_key}" />
 
         <provider
             android:name=".data.GeoTuneContentProvider"
             android:authorities="com.jawnnypoo.geotune"
-            android:exported="false"/>
+            android:exported="false" />
 
-        <activity
-            android:name="com.jawnnypoo.geotune.activity.MainActivity">
+        <activity android:name="com.jawnnypoo.geotune.activity.MainActivity">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-                <category android:name="android.intent.category.LAUNCHER"/>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
@@ -54,24 +53,24 @@
             android:name=".activity.GeoMapActivity"
             android:launchMode="singleTop"
             android:theme="@style/Transparent"
-            android:windowSoftInputMode="stateHidden"/>
+            android:windowSoftInputMode="stateHidden" />
 
-        <activity android:name=".activity.AboutActivity"/>
+        <activity android:name=".activity.AboutActivity" />
 
         <service
             android:name=".service.GeofenceTransitionsIntentService"
-            android:exported="false"/>
+            android:exported="false" />
         <service
             android:name=".service.GeoTuneModService"
-            android:exported="false"/>
+            android:exported="false" />
 
         <receiver
             android:name=".misc.CheckRegistrationReceiver"
             android:enabled="true"
             android:exported="true">
             <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED"/>
-                <action android:name="android.intent.action.ACTION_POWER_CONNECTED"/>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.ACTION_POWER_CONNECTED" />
             </intent-filter>
         </receiver>
 

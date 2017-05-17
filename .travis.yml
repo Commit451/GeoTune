@@ -12,5 +12,4 @@ before_install:
 
 script:
   - android-sdk-installer
-  - ls
   - ./gradlew assembleDebug

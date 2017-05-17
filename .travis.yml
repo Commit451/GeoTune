@@ -6,6 +6,7 @@ jdk:
 before_install:
   - rvm install 2.2.6
   - gem install android-sdk-installer
-  - android-sdk-installer
 
-script: "./gradlew assembleDebug"
+script:
+  - android-sdk-installer
+  - ./gradlew assembleDebug

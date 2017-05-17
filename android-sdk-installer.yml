@@ -1,5 +1,6 @@
 version: 25.2.3
 platform: linux
+debug: true
 components:
   - platform-tools
   - tools

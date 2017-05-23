@@ -3,11 +3,8 @@ language: java
 jdk:
   - oraclejdk8
 
-env:
-  - ANDROID_HOME=$PWD/android-sdk
-
 before_install:
-  - rvm install 2.2.6
+  - rvm install 2.3.0
   - gem install android-sdk-installer
   - android-sdk-installer
 

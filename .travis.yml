@@ -7,6 +7,8 @@ before_install:
   - rvm install 2.3.0
   - gem install android-sdk-installer
   - android-sdk-installer
+  # Set ANDROID_HOME manually
+  - export ANDROID_HOME=$PWD/android-sdk
 
 script:
   - ./gradlew assembleDebug

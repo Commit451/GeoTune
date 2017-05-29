@@ -1,5 +1,8 @@
 language: java
 
+env:
+  - ANDROID_HOME=$PWD/android-sdk
+
 jdk:
   - oraclejdk8
 
@@ -7,8 +10,8 @@ before_install:
   - rvm install 2.3.0
   - gem install android-sdk-installer
   - android-sdk-installer
-  # Set ANDROID_HOME manually
-  - export ANDROID_HOME=$PWD/android-sdk
+  - echo $ANDROID_HOME
+  - ls $ANDROID_HOME
 
 script:
   - ./gradlew assembleDebug

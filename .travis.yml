@@ -11,4 +11,4 @@ before_install:
   - gem install android-sdk-installer
   - android-sdk-installer
 
-script: "./run.sh"
+script: "./gradlew assembleDebug"

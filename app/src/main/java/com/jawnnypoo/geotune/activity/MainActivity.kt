@@ -18,6 +18,7 @@ package com.jawnnypoo.geotune.activity
 
 import android.Manifest
 import android.annotation.TargetApi
+import android.app.Activity
 import android.app.LoaderManager
 import android.content.ContentValues
 import android.content.Intent
@@ -32,66 +33,51 @@ import android.support.v4.content.ContextCompat
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.View
-
+import butterknife.BindView
+import butterknife.ButterKnife
+import butterknife.OnClick
+import com.commit451.addendum.parceler.getParcelerParcelable
+import com.commit451.addendum.parceler.getParcelerParcelableExtra
+import com.commit451.addendum.parceler.putParcelerParcelable
 import com.jawnnypoo.geotune.R
 import com.jawnnypoo.geotune.adapter.GeoTuneAdapter
 import com.jawnnypoo.geotune.data.GeoTune
 import com.jawnnypoo.geotune.dialog.ChooseUriDialog
 import com.jawnnypoo.geotune.dialog.EditNameDialog
 import com.jawnnypoo.geotune.loader.GeoTunesLoader
-import com.jawnnypoo.geotune.observable.GetFileNameObservableFactory
 import com.jawnnypoo.geotune.rx.CustomSingleObserver
 import com.jawnnypoo.geotune.service.GeoTuneModService
+import com.jawnnypoo.geotune.util.FileNameHelper
 import com.jawnnypoo.geotune.util.NotificationUtils
-
-import java.util.ArrayList
-
-import butterknife.BindView
-import butterknife.ButterKnife
-import butterknife.OnClick
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
+import java.util.*
 
 /**
  * Activity that shows all of the GeoTunes
  */
 class MainActivity : BaseActivity(), LoaderManager.LoaderCallbacks<ArrayList<GeoTune>> {
 
-    //Dialogs
-    private var editNameDialog: EditNameDialog? = null
-    private var chooseUriDialog: ChooseUriDialog? = null
-    //Views
-    @BindView(R.id.main_content) internal var root: View? = null
-    @BindView(R.id.list) internal var listGeofences: RecyclerView? = null
-    @BindView(R.id.fab) internal var fab: View? = null
-    @BindView(R.id.empty_view) internal var emptyView: View? = null
-    //Data
-    private var activeGeotune: GeoTune? = null
-    private var adapter: GeoTuneAdapter? = null
+    companion object {
 
-    private val mOnUriChoiceListener = ChooseUriDialog.OnUriChoiceMadeListener { choice ->
-        when (choice) {
-            ChooseUriDialog.UriChoice.NOTIFICATION -> {
-                chooseNotification()
-                chooseUriDialog!!.dismiss()
-            }
-            ChooseUriDialog.UriChoice.MEDIA -> {
-                chooseMedia()
-                chooseUriDialog!!.dismiss()
-            }
-        }
+        private val STATE_ACTIVE_GEOTUNE = "active_geotune"
+
+        private val LOADER_GEOTUNES = 123
+
+        private val PERMISSION_REQUEST_SAVE_TONE_WRITE_EXTERNAL_STORAGE = 1337
     }
 
-    private val mEditNameListener = EditNameDialog.OnEditNameDialogListener { name ->
-        activeGeotune!!.name = name
-        adapter!!.onGeoTuneChanged(activeGeotune)
-        editNameDialog!!.dismiss()
-        val cv = ContentValues()
-        cv.put(GeoTune.KEY_NAME, name)
-        GeoTuneModService.updateGeoTune(this@MainActivity, cv, activeGeotune!!.id)
-        activeGeotune = null
-    }
+    var editNameDialog: EditNameDialog? = null
+    var chooseUriDialog: ChooseUriDialog? = null
+
+    @BindView(R.id.main_content) lateinit var root: View
+    @BindView(R.id.list) lateinit var listGeoTunes: RecyclerView
+    @BindView(R.id.fab) lateinit var fab: View
+    @BindView(R.id.empty_view) lateinit var emptyView: View
+
+    var activeGeotune: GeoTune? = null
+    lateinit var adapter: GeoTuneAdapter
 
     @OnClick(R.id.toolbar_title)
     fun onToolbarTitleClick() {
@@ -104,13 +90,13 @@ class MainActivity : BaseActivity(), LoaderManager.LoaderCallbacks<ArrayList<Geo
         ButterKnife.bind(this)
 
         if (savedInstanceState != null) {
-            activeGeotune = savedInstanceState.getParcelable<GeoTune>(STATE_ACTIVE_GEOTUNE)
+            activeGeotune = savedInstanceState.getParcelerParcelable<GeoTune>(STATE_ACTIVE_GEOTUNE)
         }
 
-        fab!!.setOnClickListener { onAddClicked() }
-        emptyView!!.setOnClickListener { onAddClicked() }
+        fab.setOnClickListener { onAddClicked() }
+        emptyView.setOnClickListener { onAddClicked() }
 
-        listGeofences!!.layoutManager = LinearLayoutManager(this)
+        listGeoTunes.layoutManager = LinearLayoutManager(this)
         adapter = GeoTuneAdapter(object : GeoTuneAdapter.Callback {
             override fun onSetNotificationClicked(geoTune: GeoTune) {
                 activeGeotune = geoTune
@@ -145,69 +131,89 @@ class MainActivity : BaseActivity(), LoaderManager.LoaderCallbacks<ArrayList<Geo
             }
 
             override fun onGeoTuneClicked(geoTune: GeoTune) {
-                val location = intArrayOf(fab!!.x.toInt(), fab!!.y.toInt())
-                navigateToMap(location, adapter!!.geoTunes, geoTune)
+                val location = intArrayOf(fab.x.toInt(), fab.y.toInt())
+                navigateToMap(location, adapter.geoTunes, geoTune)
             }
         })
-        listGeofences!!.adapter = adapter
+        listGeoTunes.adapter = adapter
 
         setupDialogs()
         loaderManager.initLoader(LOADER_GEOTUNES, null, this)
     }
 
-    private fun onAddClicked() {
-        val location = intArrayOf(fab!!.x.toInt(), fab!!.y.toInt())
-        navigateToMap(location, adapter!!.geoTunes)
+    fun onAddClicked() {
+        val location = intArrayOf(fab.x.toInt(), fab.y.toInt())
+        navigateToMap(location, adapter.geoTunes)
     }
 
-    private fun setupDialogs() {
+    fun setupDialogs() {
         editNameDialog = EditNameDialog(this)
         chooseUriDialog = ChooseUriDialog(this)
-        editNameDialog!!.setOnEditNameListener(mEditNameListener)
-        chooseUriDialog!!.setOnUriChoiceMadeListener(mOnUriChoiceListener)
+        editNameDialog!!.setOnEditNameListener { name ->
+            activeGeotune!!.name = name
+            adapter.onGeoTuneChanged(activeGeotune!!)
+            editNameDialog!!.dismiss()
+            val cv = ContentValues()
+            cv.put(GeoTune.KEY_NAME, name)
+            GeoTuneModService.updateGeoTune(this@MainActivity, cv, activeGeotune!!.id!!)
+            activeGeotune = null
+        }
+        chooseUriDialog!!.setOnUriChoiceMadeListener { choice ->
+            when (choice) {
+                ChooseUriDialog.UriChoice.NOTIFICATION -> {
+                    chooseNotification()
+                    chooseUriDialog!!.dismiss()
+                }
+                ChooseUriDialog.UriChoice.MEDIA -> {
+                    chooseMedia()
+                    chooseUriDialog!!.dismiss()
+                }
+            }
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         when (requestCode) {
-            BaseActivity.Companion.REQUEST_GEOFENCE -> if (resultCode == Activity.RESULT_OK && data != null) {
-                val newGeoTune = data.getParcelableExtra<GeoTune>(BaseActivity.Companion.EXTRA_GEOTUNE)
+            BaseActivity.REQUEST_GEOFENCE -> if (resultCode == Activity.RESULT_OK && data != null) {
+                val newGeoTune = data.getParcelerParcelableExtra<GeoTune>(BaseActivity.Companion.EXTRA_GEOTUNE)!!
                 newGeoTune.isActive = true
-                adapter!!.addGeoTune(newGeoTune)
+                adapter.addGeoTune(newGeoTune)
                 adapterDataChanged()
                 GeoTuneModService.registerGeoTune(applicationContext, newGeoTune)
-                Snackbar.make(root!!, getString(R.string.reminder_set_tune), Snackbar.LENGTH_LONG)
+                Snackbar.make(root, getString(R.string.reminder_set_tune), Snackbar.LENGTH_LONG)
                         .show()
             }
-            BaseActivity.Companion.REQUEST_AUDIO -> if (resultCode == Activity.RESULT_OK) {
+            BaseActivity.REQUEST_AUDIO -> if (resultCode == Activity.RESULT_OK) {
                 if (data!!.data != null) {
                     Timber.d("Uri was found: %s", data.data)
                     updateGeotuneUri(data.data)
                 }
             }
-            BaseActivity.Companion.REQUEST_NOTIFICATION -> if (resultCode == Activity.RESULT_OK) {
+            BaseActivity.REQUEST_NOTIFICATION -> if (resultCode == Activity.RESULT_OK) {
                 val uri = data!!.getParcelableExtra<Uri>(RingtoneManager.EXTRA_RINGTONE_PICKED_URI)
                 updateGeotuneUri(uri)
             }
         }
     }
 
-    private fun updateGeotuneUri(uri: Uri) {
+    fun updateGeotuneUri(uri: Uri) {
         if (activeGeotune != null) {
-            GetFileNameObservableFactory.create(applicationContext, uri)
+            FileNameHelper.queryFileName(applicationContext, uri)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(object : CustomSingleObserver<String>() {
                         override fun success(name: String) {
-                            activeGeotune!!.tuneUri = uri
-                            activeGeotune!!.tuneName = name
-                            adapter!!.onGeoTuneChanged(activeGeotune)
-                            NotificationUtils.playTune(this@MainActivity, activeGeotune)
+                            val geoTune = activeGeotune!!
+                            geoTune.tuneUri = uri
+                            geoTune.tuneName = name
+                            adapter.onGeoTuneChanged(geoTune)
+                            NotificationUtils.playTune(this@MainActivity, geoTune)
                             val cv = ContentValues()
                             cv.put(GeoTune.KEY_TUNE, uri.toString())
                             cv.put(GeoTune.KEY_TUNE_NAME, name)
-                            GeoTuneModService.updateGeoTune(this@MainActivity, cv, activeGeotune!!.id)
-                            activeGeotune = null
+                            GeoTuneModService.updateGeoTune(this@MainActivity, cv, geoTune.id!!)
+                            this@MainActivity.activeGeotune = null
                         }
 
                         override fun error(throwable: Throwable) {
@@ -229,7 +235,7 @@ class MainActivity : BaseActivity(), LoaderManager.LoaderCallbacks<ArrayList<Geo
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState.putParcelable(STATE_ACTIVE_GEOTUNE, activeGeotune)
+        outState.putParcelerParcelable(STATE_ACTIVE_GEOTUNE, activeGeotune)
     }
 
     override fun onCreateLoader(id: Int, args: Bundle): Loader<ArrayList<GeoTune>>? {
@@ -245,34 +251,25 @@ class MainActivity : BaseActivity(), LoaderManager.LoaderCallbacks<ArrayList<Geo
     override fun onLoadFinished(loader: Loader<ArrayList<GeoTune>>, data: ArrayList<GeoTune>?) {
         when (loader.id) {
             LOADER_GEOTUNES -> {
-                if (data != null && adapter != null) {
+                if (data != null) {
                     Timber.d("onLoadFinished")
-                    adapter!!.setGeofences(data)
+                    adapter.setGeofences(data)
                 }
                 adapterDataChanged()
             }
         }
     }
 
-    override fun onLoaderReset(loader: Loader<*>) {}
+    override fun onLoaderReset(loader: Loader<ArrayList<GeoTune>>?) {}
 
     /**
      * Normally you would do this in an observer, but oh well
      */
-    private fun adapterDataChanged() {
-        if (adapter!!.itemCount > 0) {
-            emptyView!!.visibility = View.GONE
+    fun adapterDataChanged() {
+        if (adapter.itemCount > 0) {
+            emptyView.visibility = View.GONE
         } else {
-            emptyView!!.visibility = View.VISIBLE
+            emptyView.visibility = View.VISIBLE
         }
-    }
-
-    companion object {
-
-        private val STATE_ACTIVE_GEOTUNE = "active_geotune"
-
-        private val LOADER_GEOTUNES = 123
-
-        private val PERMISSION_REQUEST_SAVE_TONE_WRITE_EXTERNAL_STORAGE = 1337
     }
 }

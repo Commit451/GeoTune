@@ -1,45 +1,37 @@
 package com.jawnnypoo.geotune.adapter
 
 import android.support.v7.widget.RecyclerView
-import android.view.MenuItem
-import android.view.View
 import android.view.ViewGroup
 import android.widget.CompoundButton
 import android.widget.PopupMenu
-
 import com.jawnnypoo.geotune.R
 import com.jawnnypoo.geotune.data.GeoTune
 import com.jawnnypoo.geotune.viewHolder.GeoTuneViewHolder
-
-import java.util.ArrayList
+import java.util.*
 
 /**
  * Shows the [GeoTune]s
  */
-class GeoTuneAdapter(private val mCallback: Callback) : RecyclerView.Adapter<GeoTuneViewHolder>() {
+class GeoTuneAdapter(private val callback: Callback) : RecyclerView.Adapter<GeoTuneViewHolder>() {
 
-    val geoTunes: ArrayList<GeoTune>
-
-    init {
-        geoTunes = ArrayList<GeoTune>()
-    }
+    val geoTunes = mutableListOf<GeoTune>()
 
     override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): GeoTuneViewHolder {
         val geoTuneViewHolder = GeoTuneViewHolder.inflate(viewGroup)
         geoTuneViewHolder.card.setOnClickListener {
             val geoTune = geoTuneViewHolder.itemView.tag as GeoTune
-            mCallback.onGeoTuneClicked(geoTune)
+            callback.onGeoTuneClicked(geoTune)
         }
         geoTuneViewHolder.popupMenu.setOnMenuItemClickListener(PopupMenu.OnMenuItemClickListener { item ->
             val geoTune = geoTuneViewHolder.itemView.tag as GeoTune
             when (item.itemId) {
                 R.id.action_rename -> {
-                    mCallback.onRenameClicked(geoTune)
+                    callback.onRenameClicked(geoTune)
                     return@OnMenuItemClickListener true
                 }
                 R.id.action_delete -> {
                     removeGeoTune(geoTune)
-                    mCallback.onDeleteClicked(geoTune)
+                    callback.onDeleteClicked(geoTune)
                     return@OnMenuItemClickListener true
                 }
             }
@@ -51,11 +43,11 @@ class GeoTuneAdapter(private val mCallback: Callback) : RecyclerView.Adapter<Geo
                 return@OnCheckedChangeListener
             }
             geoTune.isActive = isChecked
-            mCallback.onGeoTuneSwitched(isChecked, geoTune)
+            callback.onGeoTuneSwitched(isChecked, geoTune)
         })
         geoTuneViewHolder.tune.setOnClickListener {
             val geoTune = geoTuneViewHolder.itemView.tag as GeoTune
-            mCallback.onSetNotificationClicked(geoTune)
+            callback.onSetNotificationClicked(geoTune)
         }
         return geoTuneViewHolder
     }

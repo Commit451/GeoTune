@@ -18,17 +18,13 @@ package com.jawnnypoo.geotune.service
 
 import android.app.IntentService
 import android.content.Intent
-import android.media.Ringtone
 import android.media.RingtoneManager
 import android.net.Uri
-
 import com.google.android.gms.location.Geofence
 import com.google.android.gms.location.GeofencingEvent
 import com.jawnnypoo.geotune.BuildConfig
-import com.jawnnypoo.geotune.data.GeoTune
 import com.jawnnypoo.geotune.loader.GeoTunesLoader
 import com.jawnnypoo.geotune.util.NotificationUtils
-
 import timber.log.Timber
 
 /**
@@ -56,7 +52,7 @@ class GeofenceTransitionsIntentService : IntentService(GeofenceTransitionsIntent
         }
     }
 
-    private fun playRegisteredGeoTune(geoTuneId: String) {
+    fun playRegisteredGeoTune(geoTuneId: String) {
         val geoTune = GeoTunesLoader.getGeoTune(applicationContext, geoTuneId)
         //Just to make sure
         if (geoTune == null || !geoTune.isActive) {
@@ -71,7 +67,7 @@ class GeofenceTransitionsIntentService : IntentService(GeofenceTransitionsIntent
         val ringtone = RingtoneManager.getRingtone(applicationContext, tone)
         ringtone?.play()
         if (BuildConfig.DEBUG) {
-            NotificationUtils.postNotification(applicationContext, geoTune.name)
+            NotificationUtils.postNotification(applicationContext, geoTune.name!!)
         }
     }
 }

@@ -4,25 +4,31 @@ import android.content.Intent
 import android.media.RingtoneManager
 import android.net.Uri
 import android.support.v7.app.AppCompatActivity
-
 import com.jawnnypoo.geotune.R
 import com.jawnnypoo.geotune.data.GeoTune
-
-import java.util.ArrayList
-
 import timber.log.Timber
+import java.util.*
 
 /**
  * Base activity for all others to derive
  */
 open class BaseActivity : AppCompatActivity() {
 
-    protected fun navigateToMap(location: IntArray, geoTunes: ArrayList<GeoTune>) {
+    companion object {
+
+        const val REQUEST_GEOFENCE = 819
+        const val REQUEST_AUDIO = 67
+        const val REQUEST_NOTIFICATION = 68
+
+        val EXTRA_GEOTUNE = "extra_geotune"
+    }
+
+    protected fun navigateToMap(location: IntArray, geoTunes: List<GeoTune>) {
         startActivityForResult(GeoMapActivity.newIntent(this, location, geoTunes), REQUEST_GEOFENCE)
         overridePendingTransition(R.anim.do_nothing, R.anim.do_nothing)
     }
 
-    protected fun navigateToMap(location: IntArray, geoTunes: ArrayList<GeoTune>, startingGeoTune: GeoTune) {
+    protected fun navigateToMap(location: IntArray, geoTunes: List<GeoTune>, startingGeoTune: GeoTune) {
         startActivityForResult(GeoMapActivity.newIntent(this, location, geoTunes, startingGeoTune),
                 REQUEST_GEOFENCE)
         overridePendingTransition(R.anim.do_nothing, R.anim.do_nothing)
@@ -64,14 +70,5 @@ open class BaseActivity : AppCompatActivity() {
         } else {
             overridePendingTransition(R.anim.do_nothing, R.anim.fade_out)
         }
-    }
-
-    companion object {
-
-        protected val REQUEST_GEOFENCE = 819
-        protected val REQUEST_AUDIO = 67
-        protected val REQUEST_NOTIFICATION = 68
-
-        val EXTRA_GEOTUNE = "extra_geotune"
     }
 }

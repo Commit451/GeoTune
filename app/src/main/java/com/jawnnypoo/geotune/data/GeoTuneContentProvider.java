@@ -227,15 +227,15 @@ public class GeoTuneContentProvider extends ContentProvider {
         private static final String DATABASE_CREATE = "create table " +
                 DATABASE_TABLE + " (" + KEY_ID +
                 " integer primary key autoincrement, " +
-                GeoTune.KEY_UID + " text not null, " +
-                GeoTune.KEY_NAME + " text not null, " +
-                GeoTune.KEY_LATITUDE + " real, " +
-                GeoTune.KEY_LONGITUDE + " real, " +
-                GeoTune.KEY_RADIUS + " real, " +
-                GeoTune.KEY_TRANSITION_TYPE + " integer, " +
-                GeoTune.KEY_TUNE + " text, " +
-                GeoTune.KEY_TUNE_NAME + " text, " +
-                GeoTune.KEY_ACTIVE + " integer);";
+                GeoTune.Companion.getKEY_UID() + " text not null, " +
+                GeoTune.Companion.getKEY_NAME() + " text not null, " +
+                GeoTune.Companion.getKEY_LATITUDE() + " real, " +
+                GeoTune.Companion.getKEY_LONGITUDE() + " real, " +
+                GeoTune.Companion.getKEY_RADIUS() + " real, " +
+                GeoTune.Companion.getKEY_TRANSITION_TYPE() + " integer, " +
+                GeoTune.Companion.getKEY_TUNE() + " text, " +
+                GeoTune.Companion.getKEY_TUNE_NAME() + " text, " +
+                GeoTune.Companion.getKEY_ACTIVE() + " integer);";
 
         // The name and column index of each column in your database.
         // These should be descriptive.

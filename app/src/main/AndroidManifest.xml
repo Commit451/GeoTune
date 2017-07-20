@@ -65,7 +65,7 @@
             android:exported="false" />
 
         <receiver
-            android:name=".misc.CheckRegistrationReceiver"
+            android:name=".util.CheckRegistrationReceiver"
             android:enabled="true"
             android:exported="true">
             <intent-filter>

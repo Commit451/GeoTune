@@ -14,20 +14,20 @@
  * limitations under the License.
  */
 
-package com.jawnnypoo.geotune.misc;
+package com.jawnnypoo.geotune.util
 
 /**
  * Defines app-wide constants and utilities
  */
-public final class LocationUtils {
+object LocationUtils {
 
     /*
      * Define a request code to send to Google Play services
      * This code is returned in Activity.onActivityResult
      */
-    public final static int CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;
+    val CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000
 
     //The higher, the more zoomed in
-    public static final float ZOOM_LEVEL = 17f;
-    public static final float DEFAULT_RADIUS = 30;
+    val ZOOM_LEVEL = 17f
+    val DEFAULT_RADIUS = 30f
 }

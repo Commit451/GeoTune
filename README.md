@@ -2,9 +2,9 @@
 
 Setup some tunes that play when you enter geofences, aka GeoTunes!
 
-<img src="/art/screenshot-1.png?raw=true" width="200px">
-<img src="/art/screenshot-2.png?raw=true" width="200px">
-<img src="/art/screenshot-3.png?raw=true" width="200px">
+[![Build Status](https://travis-ci.org/Commit451/GeoTune.svg?branch=master)](https://travis-ci.org/Commit451/GeoTune)
+
+<img src="/art/screenshot-1.png?raw=true" width="200px"> <img src="/art/screenshot-2.png?raw=true" width="200px"> <img src="/art/screenshot-3.png?raw=true" width="200px">
 
 <a href="https://play.google.com/store/apps/details?id=com.jawnnypoo.geotune">
   <img alt="Get it on Google Play"

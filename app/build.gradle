@@ -17,8 +17,8 @@ apply plugin: 'kotlin-android'
 apply plugin: 'io.fabric'
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion "25.0.3"
+    compileSdkVersion 26
+    buildToolsVersion "26.0.1"
 
     project.ext {
         GEOTUNE_GOOGLE_API_KEY = project.hasProperty("GEOTUNE_GOOGLE_API_KEY") ? project.GEOTUNE_GOOGLE_API_KEY : "";
@@ -27,7 +27,7 @@ android {
     defaultConfig {
         applicationId "com.jawnnypoo.geotune"
         minSdkVersion 16
-        targetSdkVersion 25
+        targetSdkVersion 26
         versionCode 111
         versionName "1.1.1"
         vectorDrawables.useSupportLibrary = true
@@ -56,7 +56,7 @@ android {
 }
 
 ext {
-    supportLibVersion = '25.4.0'
+    supportLibVersion = '26.0.1'
     playServicesVersion = '11.0.2'
     butterknifeVersion = '8.7.0'
     reptarVersion = '2.5.0'

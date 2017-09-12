@@ -251,7 +251,7 @@ class GeoMapActivity : BaseActivity() {
     private fun setUpMapIfNeeded() {
         // Do a null check to confirm that we have not already instantiated the map.
         if (map == null) {
-            mapFragment = fragmentManager.findFragmentByTag(MAP_TAG) as MapFragment
+            mapFragment = fragmentManager.findFragmentByTag(MAP_TAG) as? MapFragment
             if (mapFragment == null) {
                 mapFragment = MapFragment()
                 fragmentManager.beginTransaction()

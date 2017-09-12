@@ -5,6 +5,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.support.v7.widget.Toolbar
+import android.view.View
 import butterknife.BindView
 import butterknife.ButterKnife
 import com.jawnnypoo.geotune.R
@@ -34,9 +35,9 @@ class AboutActivity : BaseActivity() {
             onBackPressed()
         }
 
-        findViewById(R.id.apache).setOnClickListener { gotoLink(getString(R.string.apache_url)) }
-        findViewById(R.id.john_credit).setOnClickListener { gotoLink(getString(R.string.jawn_url)) }
-        findViewById(R.id.kyrsten_credit).setOnClickListener { gotoLink(getString(R.string.kyrsten_url)) }
+        findViewById<View>(R.id.apache).setOnClickListener { gotoLink(getString(R.string.apache_url)) }
+        findViewById<View>(R.id.john_credit).setOnClickListener { gotoLink(getString(R.string.jawn_url)) }
+        findViewById<View>(R.id.kyrsten_credit).setOnClickListener { gotoLink(getString(R.string.kyrsten_url)) }
     }
 
     fun gotoLink(url: String) {

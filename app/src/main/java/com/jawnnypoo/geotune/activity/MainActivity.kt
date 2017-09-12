@@ -238,7 +238,7 @@ class MainActivity : BaseActivity(), LoaderManager.LoaderCallbacks<ArrayList<Geo
         outState.putParcelerParcelable(STATE_ACTIVE_GEOTUNE, activeGeotune)
     }
 
-    override fun onCreateLoader(id: Int, args: Bundle): Loader<ArrayList<GeoTune>>? {
+    override fun onCreateLoader(id: Int, args: Bundle?): Loader<ArrayList<GeoTune>>? {
         when (id) {
             LOADER_GEOTUNES -> {
                 Timber.d("onCreateLoader")

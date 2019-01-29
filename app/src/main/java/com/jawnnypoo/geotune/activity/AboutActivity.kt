@@ -4,11 +4,9 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.support.v7.widget.Toolbar
 import android.view.View
-import butterknife.BindView
-import butterknife.ButterKnife
 import com.jawnnypoo.geotune.R
+import kotlinx.android.synthetic.main.activity_about.*
 
 /**
  * Whatchu know about me?
@@ -18,17 +16,13 @@ class AboutActivity : BaseActivity() {
     companion object {
 
         fun newInstance(context: Context): Intent {
-            val intent = Intent(context, AboutActivity::class.java)
-            return intent
+            return Intent(context, AboutActivity::class.java)
         }
     }
-
-    @BindView(R.id.toolbar) lateinit var toolbar: Toolbar
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_about)
-        ButterKnife.bind(this)
 
         toolbar.setNavigationIcon(R.drawable.ic_back)
         toolbar.setNavigationOnClickListener {

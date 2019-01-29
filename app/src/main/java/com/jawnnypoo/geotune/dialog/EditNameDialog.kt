@@ -2,29 +2,21 @@ package com.jawnnypoo.geotune.dialog
 
 import android.content.Context
 import android.support.v7.app.AppCompatDialog
-import android.widget.EditText
-import butterknife.BindView
-import butterknife.ButterKnife
-import butterknife.OnClick
 import com.jawnnypoo.geotune.R
+import kotlinx.android.synthetic.main.dialog_edit_name.*
 
 class EditNameDialog(context: Context) : AppCompatDialog(context) {
 
-    @BindView(R.id.name) lateinit var textName: EditText
-
     private var listener: ((name: String) -> Unit)? = null
-
-    @OnClick(R.id.done)
-    fun onDoneClick() {
-        returnName()
-    }
 
     init {
         setContentView(R.layout.dialog_edit_name)
-        ButterKnife.bind(this)
         textName.setOnEditorActionListener { _, _, _ ->
             returnName()
             true
+        }
+        done.setOnClickListener {
+            returnName()
         }
     }
 

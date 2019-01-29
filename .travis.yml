@@ -1,14 +1,10 @@
-language: java
-
-env:
-  - ANDROID_HOME=$PWD/android-sdk
+language: android
 
 jdk:
   - oraclejdk8
 
 before_install:
-  - rvm install 2.3.4
-  - gem install android-sdk-installer
-  - android-sdk-installer -i
+  - mkdir "$ANDROID_HOME/licenses" || true
+  - echo "d56f5187479451eabf01fb78af6dfcb131a6481e" > "$ANDROID_HOME/licenses/android-sdk-license"
 
 script: "./gradlew assembleDebug"

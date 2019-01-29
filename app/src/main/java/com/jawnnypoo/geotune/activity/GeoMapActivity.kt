@@ -7,7 +7,6 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.graphics.Point
-import android.location.Location
 import android.os.Build
 import android.os.Bundle
 import android.support.design.widget.Snackbar
@@ -17,10 +16,6 @@ import android.support.v7.widget.Toolbar
 import android.text.TextUtils
 import android.view.View
 import android.view.inputmethod.InputMethodManager
-import android.widget.EditText
-import butterknife.BindView
-import butterknife.ButterKnife
-import butterknife.OnClick
 import com.commit451.addendum.parceler.getParcelerParcelableExtra
 import com.commit451.addendum.parceler.putParcelerParcelableExtra
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException
@@ -29,7 +24,6 @@ import com.google.android.gms.location.Geofence
 import com.google.android.gms.location.places.ui.PlaceAutocomplete
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.MapFragment
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
 import com.jawnnypoo.geotune.R
@@ -37,6 +31,8 @@ import com.jawnnypoo.geotune.data.GeoTune
 import com.jawnnypoo.geotune.service.GeoTuneModService
 import com.jawnnypoo.geotune.util.AnimUtils
 import com.jawnnypoo.geotune.util.LocationUtils
+import kotlinx.android.synthetic.main.activity_geo_map.*
+import kotlinx.android.synthetic.main.map_overlay.*
 import org.adw.library.widgets.discreteseekbar.DiscreteSeekBar
 import timber.log.Timber
 import java.util.*
@@ -48,17 +44,17 @@ class GeoMapActivity : BaseActivity() {
 
     companion object {
 
-        private val MAP_TAG = "MAP_TAG"
+        private const val MAP_TAG = "MAP_TAG"
 
-        private val EXTRA_REVEAL_POINT = "EXTRA_REVEAL_POINT"
-        private val EXTRA_GEOTUNES = "EXTRA_GEOTUNES"
-        private val EXTRA_STARTING_GEOTUNE = "EXTRA_STARTING_GEOTUNE"
+        private const val EXTRA_REVEAL_POINT = "EXTRA_REVEAL_POINT"
+        private const val EXTRA_GEOTUNES = "EXTRA_GEOTUNES"
+        private const val EXTRA_STARTING_GEOTUNE = "EXTRA_STARTING_GEOTUNE"
 
-        private val ANIMATION_DURATION = 800
-        private val LIME_HUE = 69.0f
+        private const val ANIMATION_DURATION = 800
+        private const val LIME_HUE = 69.0f
 
-        private val REQUEST_PLACE = 1
-        private val REQUEST_PERMISSION_FINE_LOCATION = 2
+        private const val REQUEST_PLACE = 1
+        private const val REQUEST_PERMISSION_FINE_LOCATION = 2
 
         fun newIntent(context: Context, point: IntArray, geoTunes: List<GeoTune>): Intent {
             val intent = Intent(context, GeoMapActivity::class.java)
@@ -76,13 +72,7 @@ class GeoMapActivity : BaseActivity() {
         }
     }
 
-    @BindView(R.id.activity_root) lateinit var root: View
-    @BindView(R.id.map_overlay) lateinit var mapOverlay: View
-    @BindView(R.id.toolbar) lateinit var toolbar: Toolbar
-    @BindView(R.id.edit_name) lateinit var textName: EditText
-    @BindView(R.id.radius_bar) lateinit var radiusBar: DiscreteSeekBar
-
-    var mapFragment: MapFragment? = null
+    var mapFragment: SupportMapFragment? = null
     var map: GoogleMap? = null
     var currentMarker: Marker? = null
     var currentRadius: Circle? = null
@@ -104,26 +94,23 @@ class GeoMapActivity : BaseActivity() {
         override fun onStopTrackingTouch(discreteSeekBar: DiscreteSeekBar) {}
     }
 
-    @OnClick(R.id.fab)
-    internal fun onDoneClicked() {
-        val permissionCheck = ContextCompat.checkSelfPermission(this@GeoMapActivity, Manifest.permission.ACCESS_FINE_LOCATION)
-        if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
-            saveGeoTune()
-        } else {
-            ActivityCompat.requestPermissions(this@GeoMapActivity,
-                    arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-                    REQUEST_PERMISSION_FINE_LOCATION)
-        }
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_geo_map)
-        ButterKnife.bind(this)
 
         geoTunes = intent.getParcelerParcelableExtra<List<GeoTune>>(EXTRA_GEOTUNES)!!
         startingGeoTune = intent.getParcelerParcelableExtra<GeoTune>(EXTRA_STARTING_GEOTUNE)
 
+        fab.setOnClickListener {
+            val permissionCheck = ContextCompat.checkSelfPermission(this@GeoMapActivity, Manifest.permission.ACCESS_FINE_LOCATION)
+            if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
+                saveGeoTune()
+            } else {
+                ActivityCompat.requestPermissions(this@GeoMapActivity,
+                        arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                        REQUEST_PERMISSION_FINE_LOCATION)
+            }
+        }
         toolbar.setNavigationIcon(R.drawable.ic_back)
         toolbar.setNavigationOnClickListener { onBackPressed() }
         toolbar.inflateMenu(R.menu.map)
@@ -169,10 +156,10 @@ class GeoMapActivity : BaseActivity() {
                     .build(this@GeoMapActivity)
             startActivityForResult(intent, REQUEST_PLACE)
         } catch (e: GooglePlayServicesRepairableException) {
-            Timber.e(e, null)
+            Timber.e(e)
             // TODO: Handle the error.
         } catch (e: GooglePlayServicesNotAvailableException) {
-            Timber.e(e, null)
+            Timber.e(e)
             // TODO: Handle the error.
         }
 
@@ -206,7 +193,7 @@ class GeoMapActivity : BaseActivity() {
         setUpMapIfNeeded()
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent) {
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         when (requestCode) {
             LocationUtils.CONNECTION_FAILURE_RESOLUTION_REQUEST -> if (resultCode == Activity.RESULT_OK) {
@@ -251,17 +238,18 @@ class GeoMapActivity : BaseActivity() {
     private fun setUpMapIfNeeded() {
         // Do a null check to confirm that we have not already instantiated the map.
         if (map == null) {
-            mapFragment = fragmentManager.findFragmentByTag(MAP_TAG) as? MapFragment
+            mapFragment = supportFragmentManager.findFragmentByTag(MAP_TAG) as? SupportMapFragment
             if (mapFragment == null) {
-                mapFragment = MapFragment()
-                fragmentManager.beginTransaction()
-                        .add(R.id.map_root, mapFragment, MAP_TAG)
+                val mapFragment = SupportMapFragment()
+                supportFragmentManager.beginTransaction()
+                        .add(R.id.mapRoot, mapFragment, MAP_TAG)
                         .commit()
+                this.mapFragment = mapFragment
             }
             // Try to obtain the map from the SupportMapFragment.
-            mapFragment!!.getMapAsync { googleMap ->
+            mapFragment?.getMapAsync { googleMap ->
                 map = googleMap
-                setUpMap()
+                setUpMap(googleMap)
             }
         }
     }
@@ -273,16 +261,16 @@ class GeoMapActivity : BaseActivity() {
      *
      * This should only be called once and when we are sure that [.map] is not null.
      */
-    private fun setUpMap() {
-        map!!.setOnMapLongClickListener(mMapLongClickListener)
-        map!!.setOnMarkerClickListener(mMarkerClickListener)
-        map!!.uiSettings.isZoomControlsEnabled = false
-        map!!.uiSettings.isMapToolbarEnabled = false
+    private fun setUpMap(map: GoogleMap) {
+        map.setOnMapLongClickListener(mMapLongClickListener)
+        map.setOnMarkerClickListener(mMarkerClickListener)
+        map.uiSettings.isZoomControlsEnabled = false
+        map.uiSettings.isMapToolbarEnabled = false
         addGeoTunesToMap()
 
         if (startingGeoTune != null) {
             val geoTuneLatLng = LatLng(startingGeoTune!!.latitude, startingGeoTune!!.longitude)
-            map!!.moveCamera(CameraUpdateFactory.newLatLngZoom(geoTuneLatLng, LocationUtils.ZOOM_LEVEL))
+            map.moveCamera(CameraUpdateFactory.newLatLngZoom(geoTuneLatLng, LocationUtils.ZOOM_LEVEL))
         }
     }
 
@@ -342,17 +330,8 @@ class GeoMapActivity : BaseActivity() {
         }
     }
 
-    /**
-     * Moves the camera to the user's current location. Call after a location has been set
-     */
-    private fun moveCameraToCurrentLocation(location: Location) {
-        map!!.animateCamera(CameraUpdateFactory
-                .newLatLngZoom(LatLng(location.latitude, location.longitude), LocationUtils.ZOOM_LEVEL))
-
-    }
-
     private fun moveCameraToCurrentLocation(location: LatLng) {
-        map!!.animateCamera(CameraUpdateFactory
+        map?.animateCamera(CameraUpdateFactory
                 .newLatLngZoom(location, LocationUtils.ZOOM_LEVEL))
 
     }

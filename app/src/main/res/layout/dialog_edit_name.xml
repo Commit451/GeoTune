@@ -2,18 +2,17 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:minWidth="256dp"
     android:layout_margin="@dimen/margin_small"
+    android:minWidth="256dp"
     android:orientation="vertical">
 
     <android.support.design.widget.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/margin_small"
-        >
+        android:layout_margin="@dimen/margin_small">
 
         <EditText
-            android:id="@+id/name"
+            android:id="@+id/textName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
@@ -31,12 +30,12 @@
             android:id="@+id/done"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="8dp"
+            android:background="?attr/selectableItemBackground"
             android:gravity="center"
+            android:padding="8dp"
             android:text="@string/done"
             android:textAllCaps="true"
             android:textColor="?attr/colorAccent"
-            android:textStyle="bold"
-            android:background="?attr/selectableItemBackground"/>
+            android:textStyle="bold" />
     </LinearLayout>
 </LinearLayout>

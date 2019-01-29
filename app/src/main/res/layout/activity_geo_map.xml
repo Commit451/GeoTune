@@ -1,37 +1,36 @@
-<FrameLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/activity_root"
     android:background="@color/that_gray">
 
     <android.support.v7.widget.Toolbar
-        android:theme="@style/ToolBarStyle"
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:background="?attr/colorPrimary" >
+        android:background="?attr/colorPrimary"
+        android:theme="@style/ToolBarStyle">
 
         <TextView
+            android:id="@+id/toolbarTitle"
             style="@style/ToolbarTitle"
-            android:id="@+id/toolbar_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/add_geotune"
-            />
+            android:text="@string/add_geotune" />
 
     </android.support.v7.widget.Toolbar>
 
     <FrameLayout
+        android:id="@+id/mapRoot"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="?attr/actionBarSize"
-        android:id="@+id/map_root"/>
+        android:layout_marginTop="?attr/actionBarSize" />
 
-    <include layout="@layout/map_overlay"
-        android:id="@+id/map_overlay"
+    <include
+        android:id="@+id/mapOverlay"
+        layout="@layout/map_overlay"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom"/>
+        android:layout_gravity="bottom" />
 
 </FrameLayout>

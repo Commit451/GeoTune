@@ -12,7 +12,7 @@ import java.util.*
 /**
  * Base activity for all others to derive
  */
-open class BaseActivity : AppCompatActivity() {
+abstract class BaseActivity : AppCompatActivity() {
 
     companion object {
 
@@ -20,7 +20,7 @@ open class BaseActivity : AppCompatActivity() {
         const val REQUEST_AUDIO = 67
         const val REQUEST_NOTIFICATION = 68
 
-        val EXTRA_GEOTUNE = "extra_geotune"
+        const val EXTRA_GEOTUNE = "extra_geotune"
     }
 
     protected fun navigateToMap(location: IntArray, geoTunes: List<GeoTune>) {
